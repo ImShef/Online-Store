@@ -5,4 +5,4 @@
 > Вдохновлялся [этим репозиторием](https://github.com/Wenwu-PA/SQL-UEPA-System "Repositories")
 
 ## Диаграмма базы данных:
-![Изображение](https://raw.githubusercontent.com/ImShef/Online-Store/refs/heads/main/PhysModel/diagramm.png?token=GHSAT0AAAAAADMMEB6CURRZ3IL34EPBAN3M2JDITTA "Диаграмма")
+![Изображение](https://raw.githubusercontent.com/ImShef/Online-Store/refs/heads/main/PhysModel/diagramm.png "Диаграмма")
