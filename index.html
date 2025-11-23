@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модели БД - Интернет-магазин электроники</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .models-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .model-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin: 15px 0 10px;
+            font-size: 1.3rem;
+        }
+        
+        .entities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .entity {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .entity-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .attribute {
+            margin: 5px 0;
+            padding-left: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .relationships {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .relationship {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2980b9;
+        }
+        
+        .relationship-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            font-size: 0.85rem;
+        }
+        
+        .table th {
+            background: #3498db;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        
+        .table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        
+        .table tr:hover {
+            background: #edf2f7;
+        }
+        
+        .key {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .foreign-key {
+            font-weight: bold;
+            color: #9b59b6;
+        }
+        
+        .normalization {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .entities-grid,
+            .relationships,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .model-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>База данных интернет-магазина электроники</h1>
+            <div class="subtitle">Концептуальная и логическая модель</div>
+        </header>
+        
+        <div class="content">
+            <div class="models-container">
+                <!-- Концептуальная модель -->
+                <div class="model-section">
+                    <h2>Концептуальная модель</h2>
+                    <p>Описание сущностей и их взаимосвязей в системе</p>
+                    
+                    <div class="entities-grid">
+                        <div class="entity">
+                            <div class="entity-name">Customers (Клиенты)</div>
+                            <div class="attribute">ID клиента</div>
+                            <div class="attribute">Имя и фамилия</div>
+                            <div class="attribute">Email (уникальный)</div>
+                            <div class="attribute">Телефон</div>
+                            <div class="attribute">Адрес доставки</div>
+                        </div>
+                        
+                        <div class="entity">
+                            <div class="entity-name">Products (Товары)</div>
+                            <div class="attribute">ID товара</div>
+                            <div class="attribute">Название товара</div>
+                            <div class="attribute">Описание</div>
+                            <div class="attribute">Цена</div>
+                            <div class="attribute">ID категории</div>
+                            <div class="attribute">ID поставщика</div>
+                        </div>
+                        
+                        <div class="entity">
+                            <div class="entity-name">Categories (Категории)</div>
+                            <div class="attribute">ID категории</div>
+                            <div class="attribute">Название категории</div>
+                            <div class="attribute">ID родительской категории</div>
+                        </div>
+                        
+                        <div class="entity">
+                            <div class="entity-name">Suppliers (Поставщики)</div>
+                            <div class="attribute">ID поставщика</div>
+                            <div class="attribute">Название компании</div>
+                            <div class="attribute">Контактное лицо</div>
+                            <div class="attribute">Телефон</div>
+                        </div>
+                        
+                        <div class="entity">
+                            <div class="entity-name">Orders (Заказы)</div>
+                            <div class="attribute">ID заказа</div>
+                            <div class="attribute">ID клиента</div>
+                            <div class="attribute">Дата заказа</div>
+                            <div class="attribute">Статус заказа</div>
+                            <div class="attribute">Общая сумма</div>
+                        </div>
+                        
+                        <div class="entity">
+                            <div class="entity-name">Order_Items (Позиции заказа)</div>
+                            <div class="attribute">ID позиции</div>
+                            <div class="attribute">ID заказа</div>
+                            <div class="attribute">ID товара</div>
+                            <div class="attribute">Количество</div>
+                            <div class="attribute">Цена на момент покупки</div>
+                        </div>
+                        
+                        <div class="entity">
+                            <div class="entity-name">Inventory (Складские остатки)</div>
+                            <div class="attribute">ID записи</div>
+                            <div class="attribute">ID товара</div>
+                            <div class="attribute">Количество на складе</div>
+                            <div class="attribute">Дата последнего пополнения</div>
+                        </div>
+                    </div>
+                <!-- Логическая модель -->
+                <div class="model-section">
+                    <h2>Логическая модель</h2>
+                    <p>Структура таблиц, типы данных и ограничения</p>
+                    
+                    <h3>Структура таблиц</h3>
+                    
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Таблица</th>
+                                    <th>Поле</th>
+                                    <th>Тип данных</th>
+                                    <th>Ограничения</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="5">customers</td>
+                                    <td><span class="key">customer_id</span></td>
+                                    <td>INT</td>
+                                    <td>PRIMARY KEY, AUTO_INCREMENT</td>
+                                </tr>
+                                <tr>
+                                    <td>first_name</td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>last_name</td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>email</td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>phone</td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>NULL</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td rowspan="3">categories</td>
+                                    <td><span class="key">category_id</span></td>
+                                    <td>INT</td>
+                                    <td>PRIMARY KEY, AUTO_INCREMENT</td>
+                                </tr>
+                                <tr>
+                                    <td>category_name</td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="foreign-key">parent_category_id</span></td>
+                                    <td>INT</td>
+                                    <td>FOREIGN KEY, NULL</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td rowspan="6">products</td>
+                                    <td><span class="key">product_id</span></td>
+                                    <td>INT</td>
+                                    <td>PRIMARY KEY, AUTO_INCREMENT</td>
+                                </tr>
+                                <tr>
+                                    <td>product_name</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>description</td>
+                                    <td>TEXT</td>
+                                    <td>NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>price</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL, CHECK >= 0</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="foreign-key">category_id</span></td>
+                                    <td>INT</td>
+                                    <td>FOREIGN KEY, NULL</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="foreign-key">supplier_id</span></td>
+                                    <td>INT</td>
+                                    <td>FOREIGN KEY, NULL</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td rowspan="5">orders</td>
+                                    <td><span class="key">order_id</span></td>
+                                    <td>INT</td>
+                                    <td>PRIMARY KEY, AUTO_INCREMENT</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="foreign-key">customer_id</span></td>
+                                    <td>INT</td>
+                                    <td>FOREIGN KEY, NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>order_date</td>
+                                    <td>DATETIME</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                </tr>
+                                <tr>
+                                    <td>status</td>
+                                    <td>ENUM</td>
+                                    <td>обрабатывается, оплачен, отправлен, доставлен</td>
+                                </tr>
+                                <tr>
+                                    <td>total_amount</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL, DEFAULT 0</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td rowspan="5">order_items</td>
+                                    <td><span class="key">order_item_id</span></td>
+                                    <td>INT</td>
+                                    <td>PRIMARY KEY, AUTO_INCREMENT</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="foreign-key">order_id</span></td>
+                                    <td>INT</td>
+                                    <td>FOREIGN KEY, NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="foreign-key">product_id</span></td>
+                                    <td>INT</td>
+                                    <td>FOREIGN KEY, NOT NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>quantity</td>
+                                    <td>INT</td>
+                                    <td>NOT NULL, CHECK > 0</td>
+                                </tr>
+                                <tr>
+                                    <td>unit_price</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL, CHECK >= 0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>Ключевые особенности</h3>
+                    
+                    <div class="features-grid">
+                        <div class="feature">
+                            <div class="entity-name">Рекурсивная связь категорий</div>
+                            <p>Поле parent_category_id ссылается на category_id в той же таблице, создавая иерархическую структуру категорий</p>
+                        </div>
+                        
+                        <div class="feature">
+                            <div class="entity-name">Историчность цен</div>
+                            <p>Поле unit_price в order_items сохраняет цену товара на момент покупки, обеспечивая финансовую отчетность</p>
+                        </div>
+                        
+                        <div class="feature">
+                            <div class="entity-name">Целостность данных</div>
+                            <p>Внешние ключи и проверочные ограничения гарантируют корректность данных на уровне БД</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Проектирование базы данных для интернет-магазина электроники</p>
+        </footer>
+    </div>
+</body>
+</html>
