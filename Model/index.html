@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept model</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .heading {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .blocks {
+            display: flex;
+            gap: 40px;
+            justify-content: space-between;
+        }
+        .concept, .logic {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        ul {
+            margin: 5px 0 15px 20px;
+            padding-left: 15px;
+        }
+        ul li {
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="heading">Концептуальная и логическая модель для проекта - Интернет-магазин электроники</h2>
+    <div class="blocks">
+        <div class="concept">
+            <h3>Концептуальная модель</h3>
+            <ol>
+                <li>Клиенты</li>
+                <ul>
+                    <li>Имя</li>
+                    <li>Фамилия</li>
+                    <li>Email</li>
+                    <li>Телефон</li>
+                    <li>Адрес</li>
+                </ul>
+                <li>Категории</li>
+                <ul>
+                    <li>Название категории</li>
+                    <li>Родительская категория</li>
+                </ul>
+                <li>Поставщики</li>
+                <ul>
+                    <li>Название компании</li>
+                    <li>Контактное лицо</li>
+                    <li>Телефон</li>
+                </ul>
+                <li>Товары</li>
+                <ul>
+                    <li>Название товара</li>
+                    <li>Описание</li>
+                    <li>Цена</li>
+                    <li>Категория</li>
+                    <li>Поставщик</li>
+                </ul>
+                <li>Заказы</li>
+                <ul>
+                    <li>Клиент</li>
+                    <li>Дата заказа</li>
+                    <li>Статус заказа</li>
+                    <li>Общая сумма</li>
+                </ul>
+                <li>Позиции заказа</li>
+                <ul>
+                    <li>Заказ</li>
+                    <li>Товар</li>
+                    <li>Количество</li>
+                    <li>Цена на момент покупки</li>
+                </ul>
+                <li>Складские остатки</li>
+                <ul>
+                    <li>Товар</li>
+                    <li>Количество</li>
+                    <li>Дата последнего пополнения</li>
+                </ul>
+            </ol>
+        </div>
+        <div class="logic">
+            <h3>Логическая модель</h3>
+            <ol>
+                <li>customers</li>
+                <ul>
+                    <li>customer_id (INT, Primary Key)</li>
+                    <li>first_name (VARCHAR(50))</li>
+                    <li>last_name (VARCHAR(50))</li>
+                    <li>email (VARCHAR(100))</li>
+                    <li>phone (VARCHAR(20))</li>
+                    <li>address (TEXT)</li>
+                </ul>
+                <li>categories</li>
+                <ul>
+                    <li>category_id (INT, Primary Key)</li>
+                    <li>category_name (VARCHAR(100))</li>
+                    <li>parent_category_id (INT, Foreign Key to categories.category_id)</li>
+                </ul>
+                <li>suppliers</li>
+                <ul>
+                    <li>supplier_id (INT, Primary Key)</li>
+                    <li>company_name (VARCHAR(100))</li>
+                    <li>contact_name (VARCHAR(100))</li>
+                    <li>phone (VARCHAR(20))</li>
+                </ul>
+                <li>products</li>
+                <ul>
+                    <li>product_id (INT, Primary Key)</li>
+                    <li>product_name (VARCHAR(255))</li>
+                    <li>description (TEXT)</li>
+                    <li>price (DECIMAL(10,2))</li>
+                    <li>category_id (INT, Foreign Key to categories.category_id)</li>
+                    <li>supplier_id (INT, Foreign Key to suppliers.supplier_id)</li>
+                </ul>
+                <li>orders</li>
+                <ul>
+                    <li>order_id (INT, Primary Key)</li>
+                    <li>customer_id (INT, Foreign Key to customers.customer_id)</li>
+                    <li>order_date (DATETIME)</li>
+                    <li>status (ENUM('обрабатывается', 'оплачен', 'отправлен', 'доставлен'))</li>
+                    <li>total_amount (DECIMAL(10,2))</li>
+                </ul>
+                <li>order_items</li>
+                <ul>
+                    <li>order_item_id (INT, Primary Key)</li>
+                    <li>order_id (INT, Foreign Key to orders.order_id)</li>
+                    <li>product_id (INT, Foreign Key to products.product_id)</li>
+                    <li>quantity (INT)</li>
+                    <li>unit_price (DECIMAL(10,2))</li>
+                </ul>
+                <li>inventory</li>
+                <ul>
+                    <li>inventory_id (INT, Primary Key)</li>
+                    <li>product_id (INT, Foreign Key to products.product_id)</li>
+                    <li>quantity (INT)</li>
+                    <li>last_restocked (DATETIME)</li>
+                </ul>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
