@@ -1,67 +1,109 @@
--- Создание таблицы клиентов
-CREATE TABLE customers (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    address TEXT
+-- ===========================================
+-- 1. CATEGORY
+-- ===========================================
+CREATE TABLE Category (
+    category_id        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name               VARCHAR(100) NOT NULL,
+    parent_category_id INT UNSIGNED,
+    FOREIGN KEY (parent_category_id)
+        REFERENCES Category(category_id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
--- Иерархическая структура категорий
-CREATE TABLE categories (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL,
-    parent_category_id INT NULL,
-    FOREIGN KEY (parent_category_id) REFERENCES categories(category_id) ON DELETE SET NULL
+-- ===========================================
+-- 2. SUPPLIER
+-- ===========================================
+CREATE TABLE Supplier (
+    supplier_id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name          VARCHAR(150) NOT NULL,
+    contact_phone VARCHAR(20),
+    address       VARCHAR(255)
 );
 
--- Таблица поставщиков
-CREATE TABLE suppliers (
-    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
-    company_name VARCHAR(100) NOT NULL,
-    contact_name VARCHAR(100),
-    phone VARCHAR(20)
+-- ===========================================
+-- 3. PRODUCT
+-- ===========================================
+CREATE TABLE Product (
+    product_id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(150) NOT NULL,
+    category_id  INT UNSIGNED NOT NULL,
+    supplier_id  INT UNSIGNED,
+    price        DECIMAL(12,2) NOT NULL CHECK (price >= 0),
+    description  VARCHAR(500),
+
+    FOREIGN KEY (category_id)
+        REFERENCES Category(category_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    FOREIGN KEY (supplier_id)
+        REFERENCES Supplier(supplier_id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
--- Основной каталог товаров
-CREATE TABLE products (
-    product_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_name VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
-    category_id INT,
-    supplier_id INT,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL,
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE SET NULL
+CREATE INDEX idx_product_category ON Product(category_id);
+
+-- ===========================================
+-- 4. CUSTOMER
+-- ===========================================
+CREATE TABLE Customer (
+    customer_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(150) NOT NULL,
+    email       VARCHAR(254) NOT NULL UNIQUE,
+    phone       VARCHAR(20),
+    address     VARCHAR(255)
 );
 
--- Заголовки заказов
-CREATE TABLE orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('обрабатывается', 'оплачен', 'отправлен', 'доставлен') DEFAULT 'обрабатывается',
-    total_amount DECIMAL(10, 2) NOT NULL DEFAULT 0,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
+-- ===========================================
+-- 5. ORDERS
+-- ===========================================
+CREATE TABLE Orders (
+    order_id     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    customer_id  INT UNSIGNED NOT NULL,
+    order_date   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status       VARCHAR(50) NOT NULL DEFAULT 'pending',
+
+    FOREIGN KEY (customer_id)
+        REFERENCES Customer(customer_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
--- Позиции заказов (решение M:M)
-CREATE TABLE order_items (
-    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL CHECK (quantity > 0),
-    unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+CREATE INDEX idx_orders_customer ON Orders(customer_id);
+
+-- ===========================================
+-- 6. ORDER ITEM
+-- ===========================================
+CREATE TABLE OrderItem (
+    order_id   INT UNSIGNED NOT NULL,
+    product_id INT UNSIGNED NOT NULL,
+    quantity   INT NOT NULL CHECK (quantity > 0),
+    price      DECIMAL(12,2) NOT NULL CHECK (price >= 0),
+
+    PRIMARY KEY (order_id, product_id),
+
+    FOREIGN KEY (order_id)
+        REFERENCES Orders(order_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (product_id)
+        REFERENCES Product(product_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
 
--- Управление запасами
-CREATE TABLE inventory (
-    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT NOT NULL UNIQUE,
-    quantity INT NOT NULL DEFAULT 0 CHECK (quantity >= 0),
-    last_restocked DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+-- ===========================================
+-- 7. INVENTORY
+-- ===========================================
+CREATE TABLE Inventory (
+    product_id        INT UNSIGNED PRIMARY KEY,
+    quantity_in_stock INT NOT NULL DEFAULT 0 CHECK (quantity_in_stock >= 0),
+
+    FOREIGN KEY (product_id)
+        REFERENCES Product(product_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );

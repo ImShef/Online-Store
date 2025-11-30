@@ -6,15 +6,16 @@
 
 ## Концептуальная модель база данных:
 
-| Сущность | Описание | Ключевые атрибуты |
-|----------|-----------|-------------------|
-| **👥 Customers** | Зарегистрированные клиенты магазина | customer_id, first_name, last_name, email, phone, address |
-| **📦 Products** | Товары электроники в каталоге | product_id, product_name, description, price, category_id, supplier_id |
-| **🏷️ Categories** | Категории и подкатегории товаров | category_id, category_name, parent_category_id |
-| **🏭 Suppliers** | Поставщики и производители | supplier_id, company_name, contact_name, phone |
-| **🛒 Orders** | Заказы клиентов | order_id, customer_id, order_date, status, total_amount |
-| **📋 Order_Items** | Позиции в заказах | order_item_id, order_id, product_id, quantity, unit_price |
-| **📊 Inventory** | Складские остатки товаров | inventory_id, product_id, quantity, last_restocked |
+| Сущность      | Ключевые атрибуты                     | Описание                            |
+| ------------- | ------------------------------------- | ----------------------------------- |
+| **Category**  | category_id, name                     | Категория товаров                   |
+| **Supplier**  | supplier_id, name                     | Поставщик товаров                   |
+| **Product**   | product_id, name, price               | Товар интернет-магазина             |
+| **Customer**  | customer_id, name, email              | Клиент магазина                     |
+| **Order**     | order_id, order_date, status          | Заказ, создаваемый клиентом         |
+| **OrderItem** | order_id, product_id, quantity, price | Позиция товара в заказе             |
+| **Inventory** | product_id, quantity_in_stock         | Текущее количество товара на складе |
+
 
 ## Логическая модель базы данных:
 ![Изображение](https://raw.githubusercontent.com/ImShef/Online-Store/refs/heads/main/PhysModel/diagramm.png "Диаграмма")
